@@ -3,8 +3,6 @@ import json
 import requests
 
 
-# Setup exponential backoff with 'Full Jitter' as jitter algorithm as defined in:
-# https://www.awsarchitectureblog.com/2015/03/backoff.html
 def ping(url, conn_timeout=4, read_timeout=3):
     # TODO: add type annotations
     resp = requests.head(url, timeout=(conn_timeout, read_timeout))

@@ -33,12 +33,15 @@ def run():
         config=conf,
     )
 
-    # Configure backoff decorator
+    # Configure exponential backoff without jitter;
+    # no competing clients, as described here:
+    # https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
     backoff_deco = backoff.on_exception(
         backoff.expo,
         requests.exceptions.RequestException,
         on_backoff=backoff_handler,
         max_tries=conf.backoff_retries,
+        jitter=None,
     )
 
     # Main loop
