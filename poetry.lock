@@ -94,6 +94,24 @@ version = "0.4.3"
 
 [[package]]
 category = "main"
+description = "simplified environment variable parsing"
+name = "environs"
+optional = false
+python-versions = ">=3.5.3"
+version = "8.0.0"
+
+[package.dependencies]
+marshmallow = ">=2.7.0"
+python-dotenv = "*"
+
+[package.extras]
+dev = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url", "flake8 (3.8.2)", "flake8-bugbear (20.1.4)", "mypy (0.770)", "tox"]
+django = ["dj-database-url", "dj-email-url", "django-cache-url"]
+lint = ["flake8 (3.8.2)", "flake8-bugbear (20.1.4)", "mypy (0.770)"]
+tests = ["pytest", "dj-database-url", "dj-email-url", "django-cache-url"]
+
+[[package]]
+category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
@@ -120,6 +138,20 @@ name = "lazy-object-proxy"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.4.3"
+
+[[package]]
+category = "main"
+description = "A lightweight library for converting complex datatypes to and from native Python datatypes."
+name = "marshmallow"
+optional = false
+python-versions = ">=3.5"
+version = "3.7.1"
+
+[package.extras]
+dev = ["pytest", "pytz", "simplejson", "mypy (0.782)", "flake8 (3.8.3)", "flake8-bugbear (20.1.4)", "tox"]
+docs = ["sphinx (3.1.2)", "sphinx-issues (1.2.0)", "alabaster (0.7.12)", "sphinx-version-warning (1.1.2)", "autodocsumm (0.1.13)"]
+lint = ["mypy (0.782)", "flake8 (3.8.3)", "flake8-bugbear (20.1.4)"]
+tests = ["pytest", "pytz", "simplejson"]
 
 [[package]]
 category = "dev"
@@ -230,6 +262,17 @@ checkqa-mypy = ["mypy (v0.761)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+category = "main"
+description = "Add .env support to your django/flask apps in development and deployments"
+name = "python-dotenv"
+optional = false
+python-versions = "*"
+version = "0.14.0"
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
 category = "dev"
 description = "Alternative regular expression module, to replace re."
 name = "regex"
@@ -334,7 +377,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "add15bbbf072be68100d764b4504cda632306e86ffb55e66e46ed0669beb0908"
+content-hash = "2f6e99c98b022cc60e516166f6dee3c26449e1cb185a3d7900c698e769832dd3"
 lock-version = "1.1"
 python-versions = "^3.8"
 
@@ -375,6 +418,10 @@ colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
 ]
+environs = [
+    {file = "environs-8.0.0-py2.py3-none-any.whl", hash = "sha256:a98005aab7613b6fe7a1af7192a5163f72a52d3348d3918e6c7a2a32e4012779"},
+    {file = "environs-8.0.0.tar.gz", hash = "sha256:bf3fd6bc54fcfd7f512ddcb80a7781f0ced2b0c83dd123d619e9468ecdaaf537"},
+]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
@@ -405,6 +452,10 @@ lazy-object-proxy = [
     {file = "lazy_object_proxy-1.4.3-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:a6ae12d08c0bf9909ce12385803a543bfe99b95fe01e752536a60af2b7797c62"},
     {file = "lazy_object_proxy-1.4.3-cp38-cp38-win32.whl", hash = "sha256:5541cada25cd173702dbd99f8e22434105456314462326f06dba3e180f203dfd"},
     {file = "lazy_object_proxy-1.4.3-cp38-cp38-win_amd64.whl", hash = "sha256:59f79fef100b09564bc2df42ea2d8d21a64fdcda64979c0fa3db7bdaabaf6239"},
+]
+marshmallow = [
+    {file = "marshmallow-3.7.1-py2.py3-none-any.whl", hash = "sha256:67bf4cae9d3275b3fc74bd7ff88a7c98ee8c57c94b251a67b031dc293ecc4b76"},
+    {file = "marshmallow-3.7.1.tar.gz", hash = "sha256:a2a5eefb4b75a3b43f05be1cca0b6686adf56af7465c3ca629e5ad8d1e1fe13d"},
 ]
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
@@ -445,6 +496,10 @@ pyparsing = [
 pytest = [
     {file = "pytest-5.4.3-py3-none-any.whl", hash = "sha256:5c0db86b698e8f170ba4582a492248919255fcd4c79b1ee64ace34301fb589a1"},
     {file = "pytest-5.4.3.tar.gz", hash = "sha256:7979331bfcba207414f5e1263b5a0f8f521d0f457318836a7355531ed1a4c7d8"},
+]
+python-dotenv = [
+    {file = "python-dotenv-0.14.0.tar.gz", hash = "sha256:8c10c99a1b25d9a68058a1ad6f90381a62ba68230ca93966882a4dbc3bc9c33d"},
+    {file = "python_dotenv-0.14.0-py2.py3-none-any.whl", hash = "sha256:c10863aee750ad720f4f43436565e4c1698798d763b63234fb5021b6c616e423"},
 ]
 regex = [
     {file = "regex-2020.7.14-cp27-cp27m-win32.whl", hash = "sha256:e46d13f38cfcbb79bfdb2964b0fe12561fe633caf964a77a5f8d4e45fe5d2ef7"},
