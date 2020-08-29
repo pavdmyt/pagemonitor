@@ -12,6 +12,7 @@ requests = "^2.24.0"
 wrapt = "^1.12.1"
 structlog = "^20.1.0"
 environs = "^8.0.0"
+backoff = "^1.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

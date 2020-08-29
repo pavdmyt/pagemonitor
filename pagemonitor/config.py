@@ -28,7 +28,8 @@ def parse_config():
         "conn_timeout": env.float("PAGEMON_CONNECT_TIMEOUT", 4),
         # Number of seconds the client will wait for the server to send a response.
         # In 99.9% of cases, this is the time before the server sends the first byte).
-        # READ_TIMEOUT = 3
         "read_timeout": env.float("PAGEMON_READ_TIMEOUT", 3),
+        # Number of retries for exponential backoff
+        "backoff_retries": env.int("PAGEMON_BACKOFF_RETRIES", 10),
     }
     return DotDict(config)
