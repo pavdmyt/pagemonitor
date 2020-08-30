@@ -22,7 +22,7 @@ def ping(url, conn_timeout=4, read_timeout=3):
 #
 # https://github.com/litl/backoff#event-handlers
 def backoff_handler(details):
-    """Log backoff details."""
+    """Pretty-print backoff details."""
     msg = {
         "event": "backoff",
         "target": repr(details["target"]),

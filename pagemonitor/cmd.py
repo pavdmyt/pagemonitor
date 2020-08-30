@@ -82,10 +82,10 @@ def run():
         # Write monit data into Kafka synchronously
         #
         log.info("producing record", record=msg)
+        # https://docs.confluent.io/current/clients/confluent-kafka-python/index.html#confluent_kafka.Producer.produce
         producer.produce(
             conf.kafka_topic, json.dumps(msg), on_delivery=ack_handler
         )
-        producer.poll(0)
-        producer.flush()
+        producer.flush()  # calls poll() automatically
 
         time.sleep(conf.ping_interval)
