@@ -10,7 +10,7 @@ from confluent_kafka import Producer
 
 from . import __version__
 from .config import parse_config
-from .logger import log
+from .logger import log, producer_log
 from .ping import backoff_handler, ping
 from .producer import ack_handler
 
@@ -51,7 +51,8 @@ def run():
             "bootstrap.servers": "{}:{}".format(
                 conf.kafka_host, conf.kafka_port
             ),
-        }
+        },
+        logger=producer_log,
     )
 
     # Main loop
