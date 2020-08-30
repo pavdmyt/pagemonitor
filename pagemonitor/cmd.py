@@ -46,11 +46,15 @@ def run():
     )
 
     # Instantiate Kafka producer
+    # Configuration options:
+    # https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
     producer = Producer(
+        # XXX: production setup should communicate via SSL
         {
             "bootstrap.servers": "{}:{}".format(
                 conf.kafka_host, conf.kafka_port
             ),
+            "retries": conf.producer_retries,
         },
         logger=producer_log,
     )
@@ -83,6 +87,8 @@ def run():
         #
         log.info("producing record", record=msg)
         # https://docs.confluent.io/current/clients/confluent-kafka-python/index.html#confluent_kafka.Producer.produce
+
+        # TODO: connection failures should not block page pings
         producer.produce(
             conf.kafka_topic, json.dumps(msg), on_delivery=ack_handler
         )

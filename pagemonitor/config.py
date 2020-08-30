@@ -35,5 +35,6 @@ def parse_config():
         "kafka_host": env.str("PAGEMON_KAFKA_HOST", "localhost"),
         "kafka_port": env.int("PAGEMON_KAFKA_PORT", 9092),
         "kafka_topic": env.str("PAGEMON_KAFKA_TOPIC", "pagemonitor_metrics"),
+        "producer_retries": env.int("PAGEMON_PRODUCER_RETRIES", 3),
     }
     return DotDict(config)
