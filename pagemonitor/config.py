@@ -31,5 +31,9 @@ def parse_config():
         "read_timeout": env.float("PAGEMON_READ_TIMEOUT", 3),
         # Number of retries for exponential backoff
         "backoff_retries": env.int("PAGEMON_BACKOFF_RETRIES", 10),
+        # Kafka related configuration
+        "kafka_host": env.str("PAGEMON_KAFKA_HOST", "localhost"),
+        "kafka_port": env.int("PAGEMON_KAFKA_PORT", 9092),
+        "kafka_topic": env.str("PAGEMON_KAFKA_TOPIC", "pagemonitor_metrics"),
     }
     return DotDict(config)

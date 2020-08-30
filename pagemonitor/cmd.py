@@ -1,3 +1,4 @@
+import json
 import signal
 import sys
 import time
@@ -5,13 +6,13 @@ import time
 import backoff
 import environs
 import requests
+from confluent_kafka import Producer
 
+from . import __version__
 from .config import parse_config
 from .logger import log
 from .ping import backoff_handler, ping
-
-
-__version__ = "0.1.0"
+from .producer import ack_handler
 
 
 def run():
@@ -44,8 +45,19 @@ def run():
         jitter=None,
     )
 
+    # Instantiate Kafka producer
+    producer = Producer(
+        {
+            "bootstrap.servers": "{}:{}".format(
+                conf.kafka_host, conf.kafka_port
+            ),
+        }
+    )
+
     # Main loop
     while True:
+        # Ping webpage
+        #
         try:
             http_code, resp_time = backoff_deco(ping)(
                 conf.page_url, conf.conn_timeout, conf.read_timeout
@@ -56,7 +68,23 @@ def run():
             log.error(error=err)
             sys.exit(1)
 
-        # Write monit data into Kafka
+        # Compose Kafka message
         #
+        msg = {
+            # Following xkcd.com/1179, sorry ISO 8601
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "page_url": conf.page_url,
+            "http_code": http_code,
+            "response_time": resp_time.microseconds,
+        }
+
+        # Write monit data into Kafka synchronously
+        #
+        log.info("producing record", record=msg)
+        producer.produce(
+            conf.kafka_topic, json.dumps(msg), on_delivery=ack_handler
+        )
+        producer.poll(0)
+        producer.flush()
 
         time.sleep(conf.ping_interval)
