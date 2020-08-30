@@ -32,9 +32,9 @@ def parse_config():
         # Number of retries for exponential backoff
         "backoff_retries": env.int("PAGEMON_BACKOFF_RETRIES", 10),
         # Kafka related configuration
-        "kafka_host": env.str("PAGEMON_KAFKA_HOST", "localhost"),
-        "kafka_port": env.int("PAGEMON_KAFKA_PORT", 9092),
+        "kafka_broker_list": env.str("PAGEMON_BROKER_LIST", "localhost:9092,"),
         "kafka_topic": env.str("PAGEMON_KAFKA_TOPIC", "pagemonitor_metrics"),
+        # How many times to retry sending a failing Message.
         "producer_retries": env.int("PAGEMON_PRODUCER_RETRIES", 3),
     }
     return DotDict(config)

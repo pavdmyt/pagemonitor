@@ -51,9 +51,7 @@ def run():
     producer = Producer(
         # XXX: production setup should communicate via SSL
         {
-            "bootstrap.servers": "{}:{}".format(
-                conf.kafka_host, conf.kafka_port
-            ),
+            "bootstrap.servers": conf.kafka_broker_list,
             "retries": conf.producer_retries,
         },
         logger=producer_log,
@@ -89,6 +87,7 @@ def run():
         # https://docs.confluent.io/current/clients/confluent-kafka-python/index.html#confluent_kafka.Producer.produce
 
         # TODO: connection failures should not block page pings
+        # TODO: write with key specifying page_url
         producer.produce(
             conf.kafka_topic, json.dumps(msg), on_delivery=ack_handler
         )
