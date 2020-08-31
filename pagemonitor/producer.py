@@ -1,7 +1,12 @@
 import json
+from asyncio import Queue
+
+from confluent_kafka import Producer
+
+from .config import DotDict
 
 
-def ack_handler(err, msg):
+def _ack_handler(err, msg):
     """Delivery report handler called on
     successful or failed delivery of message
     """
@@ -18,3 +23,15 @@ def ack_handler(err, msg):
             "offset": msg.offset(),
         }
     print(json.dumps(msg))
+
+
+async def kafka_producer(
+    client: Producer, conf: DotDict, queue: Queue
+) -> None:
+    while True:
+        msg = await queue.get()
+        client.produce(
+            conf.kafka_topic, json.dumps(msg), on_delivery=_ack_handler
+        )
+        client.poll(0)
+        queue.task_done()

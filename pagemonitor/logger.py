@@ -20,8 +20,8 @@ log = structlog.get_logger()
 # TypeError: _proxy_to_logger() takes from 2 to 3 positional arguments but 7 were given
 #
 # Let's modify it a bit to produce structured logs:
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(jsonlogger.JsonFormatter())
+_handler = logging.StreamHandler(sys.stdout)
+_handler.setFormatter(jsonlogger.JsonFormatter())
 
 producer_log = logging.getLogger("producer")
-producer_log.addHandler(handler)
+producer_log.addHandler(_handler)
