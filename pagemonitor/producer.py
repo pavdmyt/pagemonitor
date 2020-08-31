@@ -31,7 +31,10 @@ async def kafka_producer(
     while True:
         msg = await queue.get()
         client.produce(
-            conf.kafka_topic, json.dumps(msg), on_delivery=_ack_handler
+            conf.kafka_topic,
+            key=conf.page_url,
+            value=json.dumps(msg),
+            on_delivery=_ack_handler,
         )
         client.poll(0)
         queue.task_done()
