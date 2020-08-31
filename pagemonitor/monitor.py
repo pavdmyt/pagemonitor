@@ -1,5 +1,6 @@
 import asyncio
 import json
+import sys
 import time
 
 import backoff
@@ -53,9 +54,13 @@ async def monitor(conf, queue, logger):
     while True:
         # Ping webpage
         #
-        http_code, resp_time = backoff_deco(_ping)(
-            conf.page_url, conf.conn_timeout, conf.read_timeout
-        )
+        try:
+            http_code, resp_time = backoff_deco(_ping)(
+                conf.page_url, conf.conn_timeout, conf.read_timeout
+            )
+        except requests.exceptions.RequestException as err:
+            logger.error(error=err)
+            sys.exit(1)
 
         # Compose Kafka message
         #
