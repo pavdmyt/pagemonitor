@@ -1,4 +1,5 @@
 import time
+import os
 
 import pytest
 from confluent_kafka import Consumer
@@ -7,7 +8,13 @@ from pagemonitor.config import parse_config
 
 
 @pytest.fixture(scope="module")
-def app_conf():
+def page_url():
+    return "https://httpbin.org"
+
+
+@pytest.fixture(scope="module")
+def app_conf(page_url):
+    os.environ["PAGEMON_URL"] = page_url
     return parse_config()
 
 

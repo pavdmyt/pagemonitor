@@ -6,7 +6,7 @@ import time
 import pagemonitor
 
 
-def test_e2e(conf_topic, kafka_consumer):
+def test_e2e(conf_topic, kafka_consumer, page_url):
     """End-to-end test of the service.
 
     Ping given page URL, build messages with metrics data and
@@ -15,7 +15,6 @@ def test_e2e(conf_topic, kafka_consumer):
 
     """
     # Pass test configuration
-    page_url = "https://httpbin.org"
     os.environ["PAGEMON_URL"] = page_url
     os.environ["PAGEMON_KAFKA_TOPIC"] = conf_topic
     os.environ["PAGEMON_PING_INTERVAL"] = "0.5"
