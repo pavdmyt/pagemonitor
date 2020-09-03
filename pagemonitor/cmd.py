@@ -15,7 +15,11 @@ from .producer import kafka_producer
 __version__ = "0.1.0"
 
 
-async def main():
+async def main() -> None:
+    """Main logic.
+
+    Implements programm's flow.
+    """
     # Get Config
     try:
         conf = parse_config()
@@ -31,6 +35,8 @@ async def main():
     )
 
     # Instantiate Kafka producer
+    #
+
     # Configuration options:
     # https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
     kafka_client = Producer(
@@ -43,6 +49,7 @@ async def main():
     )
 
     # Instantiate HTTP client for monitor
+    #
     timeout = httpx.Timeout(connect=conf.conn_timeout, read=conf.read_timeout)
     client = httpx.AsyncClient(timeout=timeout)
 
@@ -54,7 +61,7 @@ async def main():
     await asyncio.gather(monitors)
 
 
-def run():
+def run() -> None:
     """Entry point for the built executable."""
     # TODO: signals should be registered on event loop, with proper handling
     #       for each of them.

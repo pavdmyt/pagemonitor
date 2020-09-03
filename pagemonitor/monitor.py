@@ -1,25 +1,32 @@
 import asyncio
 import json
 import time
+from asyncio import Queue
 
 import backoff
 import httpx
+from httpx import AsyncClient
+
+from .config import DotDict
 
 
-# Handlers must be callables with a unary signature accepting a dict argument.
-# This dict contains the details of the invocation. Valid keys include:
-#
-#     target: reference to the function or method being invoked
-#     args: positional arguments to func
-#     kwargs: keyword arguments to func
-#     tries: number of invocation tries so far
-#     elapsed: elapsed time in seconds so far
-#     wait: seconds to wait (on_backoff handler only)
-#     value: value triggering backoff (on_predicate decorator only)
-#
-# https://github.com/litl/backoff#event-handlers
-def _backoff_handler(details):
-    """Pretty-print backoff details."""
+def _backoff_handler(details) -> None:
+    """Pretty-print backoff details.
+
+    Handlers must be callables with a unary signature accepting a dict argument.
+    This dict contains the details of the invocation. Valid keys include:
+
+        target:  reference to the function or method being invoked
+        args:    positional arguments to func
+        kwargs:  keyword arguments to func
+        tries:   number of invocation tries so far
+        elapsed: elapsed time in seconds so far
+        wait:    seconds to wait (on_backoff handler only)
+        value:   value triggering backoff (on_predicate decorator only)
+
+    https://github.com/litl/backoff#event-handlers
+
+    """
     msg = {
         "event": "backoff",
         "target": repr(details["target"]),
@@ -32,7 +39,19 @@ def _backoff_handler(details):
     print(json.dumps(msg))
 
 
-async def monitor(client, conf, queue, logger):
+async def monitor(
+    client: AsyncClient, conf: DotDict, queue: Queue, logger
+) -> None:
+    """Collect webpage availability metrics.
+
+    Metrics are placed into the queue for subsequent processing.
+    In case of connectivity failures to Kafka Broker, retries till
+    connection is available again.
+
+    Network connctivity issues are mitigated by exponential backoff
+    with configurable amount of retries.
+
+    """
     # Configure exponential backoff without jitter;
     # no competing clients, as described here:
     # https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
@@ -47,7 +66,6 @@ async def monitor(client, conf, queue, logger):
     try:
         while True:
             # Ping webpage
-            #
             try:
                 resp = await backoff_deco(client.get)(conf.page_url)
             # Executed when backoff retries gave no result

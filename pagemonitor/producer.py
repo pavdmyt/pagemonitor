@@ -6,9 +6,12 @@ from confluent_kafka import Producer
 from .config import DotDict
 
 
-def _ack_handler(err, msg):
-    """Delivery report handler called on
-    successful or failed delivery of message
+def _ack_handler(err, msg) -> None:
+    """Delivery report handler.
+
+    Called on successful or failed delivery of message.
+    Used as callback by confluent_kafka.Producer.
+
     """
     if err:
         msg = {
@@ -28,6 +31,11 @@ def _ack_handler(err, msg):
 async def kafka_producer(
     client: Producer, conf: DotDict, queue: Queue
 ) -> None:
+    """Async producer for Kafka.
+
+    Pulls messages from queue.
+
+    """
     while True:
         msg = await queue.get()
         client.produce(
