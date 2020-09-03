@@ -6,11 +6,13 @@ import environs
 import httpx
 from confluent_kafka import Producer
 
-from . import __version__
 from .config import parse_config
 from .logger import log, producer_log
 from .monitor import monitor
 from .producer import kafka_producer
+
+
+__version__ = "0.1.0"
 
 
 async def main():
