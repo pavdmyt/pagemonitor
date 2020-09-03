@@ -1,16 +1,9 @@
 import asyncio
 import json
-import sys
 import time
 
 import backoff
-import requests
-
-
-def _ping(url, conn_timeout=4, read_timeout=3):
-    # TODO: add type annotations
-    resp = requests.head(url, timeout=(conn_timeout, read_timeout))
-    return resp.status_code, resp.elapsed
+import httpx
 
 
 # Handlers must be callables with a unary signature accepting a dict argument.
@@ -39,39 +32,46 @@ def _backoff_handler(details):
     print(json.dumps(msg))
 
 
-async def monitor(conf, queue, logger):
+async def monitor(client, conf, queue, logger):
     # Configure exponential backoff without jitter;
     # no competing clients, as described here:
     # https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
     backoff_deco = backoff.on_exception(
         backoff.expo,
-        requests.exceptions.RequestException,
+        httpx.TransportError,
         on_backoff=_backoff_handler,
         max_tries=conf.backoff_retries,
         jitter=None,
     )
 
-    while True:
-        # Ping webpage
-        #
-        try:
-            http_code, resp_time = backoff_deco(_ping)(
-                conf.page_url, conf.conn_timeout, conf.read_timeout
-            )
-        except requests.exceptions.RequestException as err:
-            logger.error(error=err)
-            sys.exit(1)
+    try:
+        while True:
+            # Ping webpage
+            #
+            try:
+                resp = await backoff_deco(client.get)(conf.page_url)
+            # Executed when backoff retries gave no result
+            except httpx.TransportError as err:
+                logger.error(error=err)
+                break
+            else:
+                http_code = resp.status_code
+                resp_time = resp.elapsed
 
-        # Compose Kafka message
-        #
-        msg = {
-            # Following xkcd.com/1179, sorry ISO 8601
-            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "page_url": conf.page_url,
-            "http_code": http_code,
-            "response_time": resp_time.microseconds,
-        }
-        logger.info(source="monitor", message=msg)
+                # Compose Kafka message
+                msg = {
+                    # Following xkcd.com/1179, sorry ISO 8601
+                    "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    "page_url": conf.page_url,
+                    "http_code": http_code,
+                    "response_time": resp_time.microseconds,
+                }
+                logger.info(source="monitor", message=msg)
 
-        await queue.put(msg)
-        await asyncio.sleep(conf.ping_interval)
+                await queue.put(msg)
+                await asyncio.sleep(conf.ping_interval)
+    finally:
+        await client.aclose()
+        for task in asyncio.Task.all_tasks():
+            logger.info("cancelling task", task=task)
+            task.cancel()

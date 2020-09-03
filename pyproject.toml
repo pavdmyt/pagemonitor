@@ -8,12 +8,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-requests = "^2.24.0"
 structlog = "^20.1.0"
 environs = "^8.0.0"
 backoff = "^1.10.0"
 confluent-kafka = "^1.5.0"
 python-json-logger = "^0.1.11"
+httpx = "^0.14.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
