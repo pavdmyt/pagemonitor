@@ -1,6 +1,8 @@
 Pagemonitor
 ===========
 
+[![Build Status](https://travis-ci.org/pavdmyt/pagemonitor.svg?branch=master)](https://travis-ci.org/pavdmyt/pagemonitor)
+
 Is a microservice designed to monitor website availability. It collects
 availability metrics with configurable interval and writes them into
 [Apache Kafka](https://kafka.apache.org/) for subsequent processing.
