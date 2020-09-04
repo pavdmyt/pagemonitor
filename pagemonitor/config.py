@@ -33,9 +33,8 @@ def parse_config() -> DotDict:
     config = {
         # env.url() returns obj of type urllib.parse.ParseResult
         "page_url": env.url("PAGEMON_URL").geturl(),
-        "ping_interval": env.float("PAGEMON_PING_INTERVAL", 5),
+        "ping_interval": env.float("PAGEMON_PING_INTERVAL", 10),
         # Number of seconds to wait to establish a connection to a remote machine.
-        #
         # It’s a good practice to set connect timeouts to slightly larger than a
         # multiple of 3, which is the default TCP packet retransmission window
         # (https://www.hjp.at/doc/rfc/rfc2988.txt)
