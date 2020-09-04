@@ -39,12 +39,22 @@ async def main() -> None:
 
     # Configuration options:
     # https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
+    client_conf = {
+        "bootstrap.servers": conf.kafka_broker_list,
+        "retries": conf.producer_retries,
+    }
+
+    if conf.kafka_enable_cert_auth:
+        auth_conf = {
+            "security.protocol": "ssl",
+            "ssl.key.location": conf.kafka_ssl_key,
+            "ssl.certificate.location": conf.kafka_ssl_cert,
+            "ssl.ca.location": conf.kafka_ssl_ca,
+        }
+        client_conf.update(auth_conf)
+
     kafka_client = Producer(
-        # XXX: production setup should communicate via SSL
-        {
-            "bootstrap.servers": conf.kafka_broker_list,
-            "retries": conf.producer_retries,
-        },
+        client_conf,
         logger=producer_log,
     )
 

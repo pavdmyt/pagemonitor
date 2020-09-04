@@ -48,7 +48,17 @@ def parse_config() -> DotDict:
         # Kafka related configuration
         "kafka_broker_list": env.str("PAGEMON_BROKER_LIST", "localhost:9092,"),
         "kafka_topic": env.str("PAGEMON_KAFKA_TOPIC", "pagemonitor_metrics"),
-        # How many times to retry sending a failing Message.
+        # How many times to retry sending a failing Message
         "producer_retries": env.int("PAGEMON_PRODUCER_RETRIES", 3),
+        # Authentication mode
+        "kafka_enable_cert_auth": env.bool("PAGEMON_ENABLE_CERT_AUTH", False),
+        # Only when cert authentication mode enabled
+        "kafka_ssl_ca": env.path("PAGEMON_SSL_CA", "/etc/pagemon/ssl/ca.pem"),
+        "kafka_ssl_cert": env.path(
+            "PAGEMON_SSL_CERT", "/etc/pagemon/ssl/service.cert"
+        ),
+        "kafka_ssl_key": env.path(
+            "PAGEMON_SSL_KEY", "/etc/pagemon/ssl/service.key"
+        ),
     }
     return DotDict(config)
