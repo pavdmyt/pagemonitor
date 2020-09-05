@@ -2,6 +2,8 @@ Pagemonitor
 ===========
 
 [![Build Status](https://travis-ci.org/pavdmyt/pagemonitor.svg?branch=master)](https://travis-ci.org/pavdmyt/pagemonitor)
+[![Updates](https://pyup.io/repos/github/pavdmyt/pagemonitor/shield.svg)](https://pyup.io/repos/github/pavdmyt/pagemonitor/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Is a microservice designed to monitor website availability. It collects
 availability metrics with configurable interval and writes them into
