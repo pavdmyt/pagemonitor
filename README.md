@@ -73,6 +73,9 @@ Install dev dependencies:
 
 ```
 $ poetry install
+
+# if you don't have poetry installed:
+pip install -r requirements.txt
 ```
 
 Lint, format, isort code:
