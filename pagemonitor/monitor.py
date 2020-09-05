@@ -1,7 +1,6 @@
 import asyncio
 import json
 import time
-from asyncio import Queue
 
 import backoff
 import httpx
@@ -46,7 +45,7 @@ def _backoff_handler(details) -> None:
 
 
 async def page_monitor(
-    client: AsyncClient, conf: DotDict, queue: Queue, logger
+    client: AsyncClient, conf: DotDict, queue: asyncio.Queue, logger
 ) -> None:
     """Collect webpage availability metrics.
 
@@ -85,5 +84,5 @@ async def page_monitor(
         }
         logger.info(source="monitor", message=msg)
 
-        await queue.put(msg)
+        asyncio.create_task(queue.put(msg))
         await asyncio.sleep(conf.ping_interval)
