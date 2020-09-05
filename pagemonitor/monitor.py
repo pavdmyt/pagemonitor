@@ -10,6 +10,12 @@ from httpx import AsyncClient
 from .config import DotDict
 
 
+def new_http_client(conn_timeout: float, read_timeout: float) -> AsyncClient:
+    """Instantiate async HTTP client."""
+    timeout = httpx.Timeout(connect=conn_timeout, read=read_timeout)
+    return httpx.AsyncClient(timeout=timeout)
+
+
 def _backoff_handler(details) -> None:
     """Pretty-print backoff details.
 
@@ -39,7 +45,7 @@ def _backoff_handler(details) -> None:
     print(json.dumps(msg))
 
 
-async def monitor(
+async def page_monitor(
     client: AsyncClient, conf: DotDict, queue: Queue, logger
 ) -> None:
     """Collect webpage availability metrics.
@@ -63,33 +69,21 @@ async def monitor(
         jitter=None,
     )
 
-    try:
-        while True:
-            # Ping webpage
-            try:
-                resp = await backoff_deco(client.get)(conf.page_url)
-            # Executed when backoff retries gave no result
-            except httpx.TransportError as err:
-                logger.error(error=err)
-                break
-            else:
-                http_code = resp.status_code
-                resp_time = resp.elapsed
+    while True:
+        # Ping webpage
+        resp = await backoff_deco(client.get)(conf.page_url)
+        http_code = resp.status_code
+        resp_time = resp.elapsed
 
-                # Compose Kafka message
-                msg = {
-                    # Following xkcd.com/1179, sorry ISO 8601
-                    "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                    "page_url": conf.page_url,
-                    "http_code": http_code,
-                    "response_time": resp_time.microseconds,
-                }
-                logger.info(source="monitor", message=msg)
+        # Compose Kafka message
+        msg = {
+            # Following xkcd.com/1179, sorry ISO 8601
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "page_url": conf.page_url,
+            "http_code": http_code,
+            "response_time": resp_time.microseconds,
+        }
+        logger.info(source="monitor", message=msg)
 
-                await queue.put(msg)
-                await asyncio.sleep(conf.ping_interval)
-    finally:
-        await client.aclose()
-        for task in asyncio.Task.all_tasks():
-            logger.info("cancelling task", task=task)
-            task.cancel()
+        await queue.put(msg)
+        await asyncio.sleep(conf.ping_interval)

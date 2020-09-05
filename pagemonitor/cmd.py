@@ -1,25 +1,69 @@
 import asyncio
+import functools
 import signal
 import sys
 
 import environs
-import httpx
 from confluent_kafka import Producer
+from httpx import AsyncClient
 
 from .config import parse_config
-from .logger import log, producer_log
-from .monitor import monitor
-from .producer import kafka_producer
+from .logger import log
+from .monitor import new_http_client, page_monitor
+from .producer import kafka_producer, new_producer
 
 
 __version__ = "0.1.0"
 
 
-async def main() -> None:
-    """Main logic.
+async def shutdown(
+    loop, http_client: AsyncClient, kafka_client: Producer, _signal=None
+) -> None:
+    """Cleanup tasks tied to the service's shutdown."""
+    if _signal:
+        log.info("received exit signal", signal=_signal.name)
 
-    Implements programm's flow.
+    log.info("closing transport and proxies", client=repr(http_client))
+    await http_client.aclose()
+    log.info("flushing Kafka producer")
+    kafka_client.flush()
+
+    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    for task in tasks:
+        task.cancel()
+
+    log.info(f"cancelling {len(tasks)} outstanding tasks")
+    await asyncio.gather(*tasks, return_exceptions=True)
+    loop.stop()
+
+
+def handle_exceptions(
+    loop, ctx, http_client: AsyncClient, kafka_client: Producer
+) -> None:
+    """Custom exception handler for event loop.
+
+    Context is a dict object containing the following keys:
+
+    ‘message’:  Error message;
+    ‘exception’ (optional): Exception object;
+    ‘future’    (optional): asyncio.Future instance;
+    ‘handle’    (optional): asyncio.Handle instance;
+    ‘protocol’  (optional): Protocol instance;
+    ‘transport’ (optional): Transport instance;
+    ‘socket’    (optional): socket.socket instance.
+
+    https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.call_exception_handler
+
     """
+    # context["message"] will always be there; but context["exception"] may not
+    msg = ctx.get("exception", ctx["message"])
+    log.error("caught exception", exception=msg)
+    log.info("Shutting down...")
+    asyncio.create_task(shutdown(loop, http_client, kafka_client))
+
+
+def run() -> None:
+    """Entry point for the built executable."""
     # Get Config
     try:
         conf = parse_config()
@@ -34,54 +78,34 @@ async def main() -> None:
         config=conf,
     )
 
-    # Instantiate Kafka producer
-    #
+    # Instantiate clients
+    http_client = new_http_client(conf.conn_timeout, conf.read_timeout)
+    kafka_client = new_producer(conf)
 
-    # Configuration options:
-    # https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
-    client_conf = {
-        "bootstrap.servers": conf.kafka_broker_list,
-        "retries": conf.producer_retries,
-    }
-
-    if conf.kafka_enable_cert_auth:
-        auth_conf = {
-            "security.protocol": "ssl",
-            "ssl.key.location": conf.kafka_ssl_key,
-            "ssl.certificate.location": conf.kafka_ssl_cert,
-            "ssl.ca.location": conf.kafka_ssl_ca,
-        }
-        client_conf.update(auth_conf)
-
-    kafka_client = Producer(
-        client_conf,
-        logger=producer_log,
-    )
-
-    # Instantiate HTTP client for monitor
-    #
-    timeout = httpx.Timeout(connect=conf.conn_timeout, read=conf.read_timeout)
-    client = httpx.AsyncClient(timeout=timeout)
-
-    # Implement producer-consumer pattern, where monitors are producers and
-    # kafka_producer is actually a consumer for monitoring data
-    queue = asyncio.Queue()
-    monitors = asyncio.create_task(monitor(client, conf, queue, logger=log))
-    asyncio.create_task(kafka_producer(kafka_client, conf, queue))
-    await asyncio.gather(monitors)
-
-
-def run() -> None:
-    """Entry point for the built executable."""
-    # TODO: signals should be registered on event loop, with proper handling
-    #       for each of them.
-    # Temporary solution.
-    signal.signal(signal.SIGINT, lambda signal, frame: sys.exit(0))
-
+    # Signals handling
     loop = asyncio.get_event_loop()
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+    for s in signals:
+        loop.add_signal_handler(
+            s,
+            lambda s=s: asyncio.create_task(
+                shutdown(loop, http_client, kafka_client, _signal=s)
+            ),
+        )
+
+    # Exception handler must be a callable with the signature matching
+    # (loop, context)
+    # https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.loop.set_exception_handler
+    exc_handler = functools.partial(
+        handle_exceptions, http_client=http_client, kafka_client=kafka_client
+    )
+    loop.set_exception_handler(exc_handler)
+    queue = asyncio.Queue()
+
     try:
-        loop.run_until_complete(main())
-    except asyncio.exceptions.CancelledError:
-        print({"error": "tasks has been cancelled"})
+        loop.create_task(page_monitor(http_client, conf, queue, log))
+        loop.create_task(kafka_producer(kafka_client, conf, queue))
+        loop.run_forever()
     finally:
         loop.close()
+        log.info("shutdown successfully")
