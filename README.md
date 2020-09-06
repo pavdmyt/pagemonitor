@@ -1,6 +1,7 @@
 Pagemonitor
 ===========
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f589842b05664ce4abcf8d5f2554cdd3)](https://app.codacy.com/manual/pavdmyt/pagemonitor?utm_source=github.com&utm_medium=referral&utm_content=pavdmyt/pagemonitor&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/pavdmyt/pagemonitor.svg?branch=master)](https://travis-ci.org/pavdmyt/pagemonitor)
 [![Updates](https://pyup.io/repos/github/pavdmyt/pagemonitor/shield.svg)](https://pyup.io/repos/github/pavdmyt/pagemonitor/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
