@@ -19,6 +19,4 @@ jobs:
       python:
         - "3.8"
       script:
-        - make coverage
-      after_success:
-        - coveralls
+        - make ci-coverage

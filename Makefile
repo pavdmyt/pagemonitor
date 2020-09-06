@@ -17,8 +17,11 @@ test:
 	@pytest --capture=no
 
 coverage: clean
-	@poetry run py.test --cov-report term --cov-report html --cov $(name) tests/
+	@poetry run py.test --cov-report=term --cov-report=html --cov-report=xml --cov $(name) tests/
 	@echo "open file://`pwd`/htmlcov/index.html"
+
+ci-coverage: coverage
+	bash <(curl -s https://codecov.io/bash)
 
 clean:
 	@find . -type d -name '__pycache__' -exec rm -rf {} +

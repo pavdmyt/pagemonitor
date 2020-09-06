@@ -22,7 +22,6 @@ pylint = "^2.6.0"
 isort = "^5.4.2"
 wrapt = "^1.12.1"
 pytest-cov = "^2.10.1"
-coveralls = "^2.1.2"
 
 [tool.poetry.scripts]
 pagemon = 'pagemonitor.cmd:run'
