@@ -7,7 +7,8 @@ import pagemonitor
 
 
 def test_e2e(conf_topic, kafka_consumer, page_url):
-    """End-to-end test of the service.
+    """
+    End-to-end test of the service.
 
     Ping given page URL, build messages with metrics data and
     write them into the Kafka topic. Examine topic for produced

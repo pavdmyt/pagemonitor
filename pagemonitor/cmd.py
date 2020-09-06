@@ -40,7 +40,8 @@ async def shutdown(
 def handle_exceptions(
     loop, ctx, http_client: AsyncClient, kafka_client: Producer
 ) -> None:
-    """Custom exception handler for event loop.
+    """
+    Custom exception handler for event loop.
 
     Context is a dict object containing the following keys:
 

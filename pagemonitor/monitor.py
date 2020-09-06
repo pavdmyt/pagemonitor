@@ -16,7 +16,8 @@ def new_http_client(conn_timeout: float, read_timeout: float) -> AsyncClient:
 
 
 def _backoff_handler(details) -> None:
-    """Pretty-print backoff details.
+    """
+    Pretty-print backoff details.
 
     Handlers must be callables with a unary signature accepting a dict argument.
     This dict contains the details of the invocation. Valid keys include:
@@ -47,7 +48,8 @@ def _backoff_handler(details) -> None:
 async def page_monitor(
     client: AsyncClient, conf: DotDict, queue: asyncio.Queue, logger
 ) -> None:
-    """Collect webpage availability metrics.
+    """
+    Collect webpage availability metrics.
 
     Metrics are placed into the queue for subsequent processing.
     In case of connectivity failures to Kafka Broker, retries till

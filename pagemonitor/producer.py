@@ -8,7 +8,8 @@ from .logger import producer_log
 
 
 def new_producer(conf: DotDict) -> Producer:
-    """Create pre-configured instance of confluent_kafka.Producer.
+    """
+    Create pre-configured instance of confluent_kafka.Producer.
 
     Configuration options:
     https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
@@ -30,7 +31,8 @@ def new_producer(conf: DotDict) -> Producer:
 
 
 def _ack_handler(err, msg) -> None:
-    """Delivery report handler.
+    """
+    Delivery report handler.
 
     Called on successful or failed delivery of message.
     Used as callback by confluent_kafka.Producer.
@@ -54,7 +56,8 @@ def _ack_handler(err, msg) -> None:
 async def kafka_producer(
     client: Producer, conf: DotDict, queue: Queue
 ) -> None:
-    """Async producer for Kafka.
+    """
+    Async producer for Kafka.
 
     Pulls messages from queue.
 
