@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pagemonitor"
-version = "0.1.0"
+version = "0.2.0"
 description = "Monitor website availability and pass metrics into Apache Kafka"
 license = "MIT"
 authors = ["Pavlo Dmytrenko <mail@pavdmyt.com>"]

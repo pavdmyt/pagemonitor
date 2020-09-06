@@ -13,7 +13,7 @@ from .monitor import new_http_client, page_monitor
 from .producer import kafka_producer, new_producer
 
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 async def shutdown(
