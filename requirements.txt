@@ -96,9 +96,9 @@ environs==8.0.0 \
 h11==0.9.0 \
     --hash=sha256:4bc6d6a1238b7615b266ada57e0618568066f57dd6fa967d1290ec9309b2f2f1 \
     --hash=sha256:33d4bca7be0fa039f4e84d50ab00531047e53d6ee8ffbc83501ea602c169cae1
-httpcore==0.10.2 \
-    --hash=sha256:afc1402fcaa6fca057bb3a9c6ccf6989a17bd0393b0cffbd778bac5fdd27446b \
-    --hash=sha256:93a4caf743e7ed29dbf7900515f0917babaa26bfaae6fb6c922ca1228519d400
+httpcore==0.11.0 \
+    --hash=sha256:35ffc735d746b83f8fc6d36f82600e56117b9e8adc65d0c0423264b6ebfef7bf \
+    --hash=sha256:7a6804b18e1b8fc61ec4df868cb5c679d225fffbb81e48455ee9b57792cc3ac6
 httpx==0.14.3 \
     --hash=sha256:3f2aa21d927ac56bfabdb82d079cf5ddd5b3147130dedc5fe8fed3a24e7a8d34 \
     --hash=sha256:96bd4de4e6b742d672e2338720baf98518efaf85c86e0b48218e1bef9f272333
